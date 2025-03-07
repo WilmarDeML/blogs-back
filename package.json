@@ -4,10 +4,10 @@
   "description": "Backend para la aplicación de blogs del bootcamp full-stack con la Universidad de Helsinky",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node --watch index.js",
     "debug": "node --inspect index.js",
-    "test": "node --test"
+    "test": "cross-env  NODE_ENV=test node --test"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/WilmarDeML/blogs-back#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "lodash.countby": "^4.6.0",
@@ -33,6 +34,7 @@
     ]
   },
   "devDependencies": {
-    "standard": "^17.1.2"
+    "standard": "^17.1.2",
+    "supertest": "^7.0.0"
   }
 }
