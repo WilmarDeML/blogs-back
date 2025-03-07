@@ -1,4 +1,5 @@
 const countBy = require('lodash.countby')
+const groupBy = require('lodash.groupby')
 
 const dummy = (blogs) => 1
 
@@ -16,9 +17,18 @@ const mostBlogs = blogs => {
   }, {})
 }
 
+const mostLikes = blogs => {
+  const groups = groupBy(blogs, 'author')
+  return Object.entries(groups).reduce((acc, [author, blogs]) => {
+    const countLikes = blogs.reduce((acc, blog) => acc + blog.likes, 0)
+    return acc.likes > countLikes ? acc : { author, likes: countLikes }
+  }, {})
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
