@@ -5,20 +5,12 @@ const { SECRET } = require('../utils/config')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.split(' ')[1]
-  }
-  return null
-}
-
 blogsRouter.get('/', async (_request, response) => {
   response.json(await Blog.find().populate('user', { password: 0, blogs: 0 }))
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const decodedToken = jwt.verify(getTokenFrom(request), SECRET)
+  const decodedToken = jwt.verify(request.token, SECRET)
 
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'invalid token' })
