@@ -27,6 +27,17 @@ test('there are six blogs', async () => {
   assert.strictEqual(response.body.length, (await helper.blogsInDb()).length)
 })
 
+test('blogs contain id and not _id property', async () => {
+  await api.get('/api/blogs')
+    .expect(200)
+    .expect((res) => {
+      for (const blog of res.body) {
+        assert.strictEqual(blog._id, undefined)
+        if ('_id' in blog) throw new Error('_id property found')
+      }
+    })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
