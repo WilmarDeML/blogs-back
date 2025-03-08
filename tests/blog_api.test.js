@@ -76,6 +76,18 @@ test('property likes is zero when not provided', async () => {
     })
 })
 
+test('code 400 is returned when title or url is not provided', async () => {
+  const newBlog = {
+    author: 'Test author'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
