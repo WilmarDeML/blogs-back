@@ -2,9 +2,11 @@ const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
 
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app')
 
 const api = supertest(app)
@@ -12,6 +14,16 @@ const api = supertest(app)
 describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+    const password = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', password })
+
+    const newUser = await user.save()
+
+    helper.initialBlogs.forEach(blog => {
+      blog.user = newUser.id
+    })
+
     await Blog.insertMany(helper.initialBlogs)
   })
 
@@ -57,6 +69,7 @@ describe('when there is initially some notes saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${await helper.getToken()}` })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -77,6 +90,7 @@ describe('when there is initially some notes saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${await helper.getToken()}` })
         .expect(201)
         .expect('Content-Type', /application\/json/)
         .expect((res) => {
@@ -92,7 +106,23 @@ describe('when there is initially some notes saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${await helper.getToken()}` })
         .expect(400)
+        .expect('Content-Type', /application\/json/)
+    })
+
+    test('fails with code 401 if token is not provided', async () => {
+      const newBlog = {
+        title: 'Test title',
+        author: 'Test author',
+        url: 'https://test.com',
+        likes: 1
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
         .expect('Content-Type', /application\/json/)
     })
   })
@@ -104,6 +134,7 @@ describe('when there is initially some notes saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set({ Authorization: `Bearer ${await helper.getToken()}` })
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
