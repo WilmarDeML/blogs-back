@@ -7,7 +7,8 @@
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development node --watch index.js",
     "debug": "node --inspect index.js",
-    "test": "cross-env  NODE_ENV=test node --test --test-concurrency=1"
+    "test": "cross-env  NODE_ENV=test node --test --test-concurrency=1",
+    "start:test": "cross-env NODE_ENV=test node index.js"
   },
   "repository": {
     "type": "git",
